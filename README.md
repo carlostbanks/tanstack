@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# Wayfare
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Private travel companion for logging trips — bookings, budget, and photos — across **Paris** and **New York**. Master-detail UI: a landing page of everything booked; click any item to go one level deeper into details with map enrichment.
 
-Currently, two official plugins are available:
+> **This is primarily a learning project for [TanStack](https://tanstack.com).** The goal is hands-on TanStack Router, Query, and Table in a real app — not a toy.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## TanStack focus
 
-## React Compiler
+- **Router** — typed routes, route params, loaders, search-params-as-state, prefetch
+- **Query** — caching, dependent + parallel queries, optimistic mutations, cache persistence
+- **Table** — sorting, filtering, grouping, aggregation (the budget ledger)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+In Phase B, GraphQL is the transport while TanStack Query stays the cache layer.
 
-## Expanding the ESLint configuration
+## Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Vite + React + TypeScript
+- TanStack Router / Query / Table
+- Tailwind CSS v4 (CSS-first `@theme`)
+- Leaflet + OpenStreetMap (maps)
+- Supabase — Postgres + Auth + Storage + GraphQL (Phase B)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Features
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Trips containing items: flight / train / hotel / activity / restaurant
+- Master-detail with map, nearby POIs, weather, and destination blurbs (free keyless APIs)
+- Budget: planned vs actual spend, multi-currency with a USD snapshot, on-the-go expense logging
+- Ticket / QR display and per-item photos
+- Private by design: auth + email allowlist + row-level security (Phase B)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Build phases
+
+- **Phase A** — frontend on mock/local data (where TanStack is learned)
+- **Phase B** — Supabase backend, GraphQL swap, auth, photo upload, deploy
+
+## Project docs
+
+- `planning/SPEC.md` — source of truth (data model, task list, conventions)
+- `planning/wayfare-design-preview.html` — design guidance (look + states), not implementation
+
+## Development
+
+```
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Conventions
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Standalone personal project — work on `main`, plain commits.
+- TypeScript throughout.
