@@ -1,4 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { CardGrid } from '../components/CardGrid'
+import { TripHeader } from '../components/TripHeader'
+import { mockItems, mockTrip } from '../data/mockTrip'
 
 export const Route = createFileRoute('/')({
   component: IndexRoute,
@@ -6,8 +9,9 @@ export const Route = createFileRoute('/')({
 
 function IndexRoute() {
   return (
-    <div className="bg-paper text-ink min-h-screen p-8 font-sans">
-      Wayfare — shell
-    </div>
+    <>
+      <TripHeader trip={mockTrip} items={mockItems} />
+      <CardGrid items={mockItems} />
+    </>
   )
 }
