@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wayfare — Design Preview</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Fraunces', 'serif'],
+          sans: ['Hanken Grotesk', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+        colors: {
+          paper: '#FBF6EC', paper2: '#F3EADB', ink: '#1F1B16', ink2: '#6B6258',
+          line: '#E2D5C0', terra: '#C2562F', terradeep: '#9C3F1E',
+          flight: '#2D6E8E', train: '#3F7A5A', hotel: '#B07A1E', activity: '#7A4FA3', food: '#B23A48',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body { background:#FBF6EC; }
+  .grain::before{ content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .perf{ border-top:2px dashed #E2D5C0; }
+  .mockmap{ background:
+      radial-gradient(circle at 20% 30%, #DCE7DA 0 12%, transparent 12%),
+      radial-gradient(circle at 75% 65%, #E6DDC9 0 18%, transparent 18%),
+      linear-gradient(#EFE7D6,#EFE7D6);
+    background-color:#EDE4D2; position:relative; overflow:hidden; }
+  .mockmap::after{ content:""; position:absolute; inset:0;
+    background-image:linear-gradient(#00000008 1px,transparent 1px),linear-gradient(90deg,#00000008 1px,transparent 1px);
+    background-size:34px 34px; }
+  .pin{ position:absolute; transform:translate(-50%,-100%); z-index:2; }
+  .routeline{ position:absolute; z-index:1; height:0; border-top:2.5px dashed #1F1B16; opacity:.5; }
+  @keyframes shimmer{100%{transform:translateX(100%)}}
+  .skel{ position:relative; overflow:hidden; background:#EDE3D2; }
+  .skel::after{ content:""; position:absolute; inset:0; transform:translateX(-100%);
+    background:linear-gradient(90deg,transparent,#FBF6EC99,transparent); animation:shimmer 1.4s infinite; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+  ::-webkit-scrollbar{height:8px;width:8px}
+  ::-webkit-scrollbar-thumb{background:#E2D5C0;border-radius:8px}
+</style>
+</head>
+<body class="grain font-sans text-ink antialiased">
+
+<!-- ════ PREVIEW SWITCHER (scaffolding, not part of real app) ════ -->
+<div class="sticky top-0 z-50 bg-ink text-paper">
+  <div class="max-w-7xl mx-auto px-4 py-2 flex items-center gap-3 flex-wrap">
+    <span class="font-mono text-[10px] tracking-widest uppercase bg-terra text-paper px-2 py-1 rounded">Preview</span>
+    <span class="text-xs text-paper/60 mr-2 hidden sm:inline">flip through states →</span>
+    <div id="switcher" class="flex gap-1 flex-wrap text-xs font-medium"></div>
+  </div>
+</div>
+
+<main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+  <!-- ════ LOGIN · DEFAULT ════ -->
+  <section data-screen="Login" class="screen active">
+    <div class="min-h-[70vh] grid place-items-center">
+      <div class="w-full max-w-sm">
+        <div class="text-center mb-8">
+          <div class="font-mono text-[11px] tracking-[0.3em] uppercase text-terra mb-2">Wayfare</div>
+          <h1 class="font-display text-4xl font-600">Welcome back</h1>
+          <p class="text-ink2 text-sm mt-1">Private trip log — authorized accounts only.</p>
+        </div>
+        <div class="bg-white/70 border border-line rounded-2xl p-6">
+          <button class="w-full flex items-center justify-center gap-2 border border-line rounded-lg py-2.5 text-sm font-medium hover:bg-paper2 transition">
+            <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-2 3.2-4.8 3.2-7.8z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.7l-3.6-2.7c-1 .7-2.3 1.1-3.6 1.1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3 .5 4.1 1.6l3.1-3.1A11 11 0 0 0 12 1 11 11 0 0 0 2.3 7.3L6 10.1c.9-2.6 3.2-4.7 6-4.7z"/></svg>
+            Continue with Google
+          </button>
+          <div class="flex items-center gap-3 my-4 text-xs text-ink2"><div class="flex-1 h-px bg-line"></div>or<div class="flex-1 h-px bg-line"></div></div>
+          <label class="block text-xs text-ink2 mb-1">Username</label>
+          <input class="w-full border border-line rounded-lg px-3 py-2 text-sm bg-paper mb-3 focus:outline-none focus:border-terra" placeholder="carlos" />
+          <label class="block text-xs text-ink2 mb-1">Passcode</label>
+          <input type="password" class="w-full border border-line rounded-lg px-3 py-2 text-sm bg-paper mb-4 focus:outline-none focus:border-terra" placeholder="••••••••" />
+          <button class="w-full bg-ink text-paper rounded-lg py-2.5 text-sm font-medium hover:bg-ink/90 transition">Enter</button>
+        </div>
+        <p class="text-center text-[11px] text-ink2 mt-4 flex items-center justify-center gap-1.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          No public signup. Access is allowlisted.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ LOGIN · DENIED (allowlist rejection) ════ -->
+  <section data-screen="Login · Denied" class="screen">
+    <div class="min-h-[70vh] grid place-items-center">
+      <div class="w-full max-w-sm text-center">
+        <div class="font-mono text-[11px] tracking-[0.3em] uppercase text-terra mb-2">Wayfare</div>
+        <div class="bg-white/70 border border-food/30 rounded-2xl p-8">
+          <div class="text-food text-3xl mb-3">⚠</div>
+          <h1 class="font-display text-2xl font-600">Not authorized</h1>
+          <p class="text-ink2 text-sm mt-2">That Google account isn't on the allowlist. Authentication succeeded, but access is denied.</p>
+          <button class="mt-5 text-sm font-medium text-terra border border-terra/40 px-4 py-2 rounded-lg hover:bg-terra/10" onclick="show('Login')">← Try another account</button>
+        </div>
+        <p class="text-[11px] text-ink2 mt-4">This is the state that makes Google SSO safe — sign-in alone isn't enough.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ LANDING · LOADED ════ -->
+  <section data-screen="Landing · Loaded" class="screen">
+    <header class="mb-8">
+      <div class="flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <div class="font-mono text-[11px] tracking-[0.3em] uppercase text-terra mb-1">Wayfare</div>
+          <h1 class="font-display text-5xl sm:text-6xl font-600 leading-none tracking-tight">Paris</h1>
+          <p class="text-ink2 mt-2 text-sm">Oct 12 – Oct 18, 2026 · 5 items · <span class="font-mono text-ink">$1,773</span> planned</p>
+        </div>
+        <nav class="flex gap-1 bg-paper2 p-1 rounded-full border border-line">
+          <button class="px-4 py-1.5 rounded-full bg-ink text-paper text-sm font-medium">Paris</button>
+          <button class="px-4 py-1.5 rounded-full text-ink2 text-sm font-medium hover:text-ink">New York</button>
+        </nav>
+      </div>
+      <div class="mt-6 flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-ink2 mr-1">View</span>
+        <div class="flex gap-1 text-sm font-medium border border-line rounded-lg overflow-hidden">
+          <button onclick="setLandingView('cards')" id="vbtn-cards" class="px-3 py-1.5 bg-ink text-paper">Cards</button>
+          <button onclick="setLandingView('agenda')" id="vbtn-agenda" class="px-3 py-1.5 text-ink2 hover:text-ink">Agenda</button>
+        </div>
+        <button onclick="show('Budget')" class="ml-auto text-sm font-medium text-terra border border-terra/40 px-3 py-1.5 rounded-lg hover:bg-terra/10">Budget →</button>
+      </div>
+    </header>
+
+    <div id="landing-cards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- flight -->
+      <article class="group bg-white/70 border border-line rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_#1f1b1633] transition cursor-pointer" onclick="show('Detail · Flight')">
+        <div class="flex items-center justify-between mb-4">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-flight">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2 16 11l3.5-3.5a2 2 0 0 0-2.8-2.8L13 8.2 4.8 6.4a1 1 0 0 0-.9 1.7l5.3 3.7-1.2 3.2-2.3-.6a1 1 0 0 0-1 1.5l1.9 2.8L9 23a1 1 0 0 0 1.5-1l-.6-2.3 3.2-1.2 3.7 5.3a1 1 0 0 0 1.7-.9z"/></svg>Flight
+          </span>
+          <span class="text-[10px] font-medium text-train bg-train/10 px-2 py-0.5 rounded-full">Confirmed</span>
+        </div>
+        <h3 class="font-display text-xl font-600 leading-snug">MIA → CDG</h3>
+        <p class="text-sm text-ink2 mt-1">American AA62 · Oct 12, 6:40 PM</p>
+        <p class="font-mono text-base font-medium mt-2">$842</p>
+        <div class="perf mt-4 pt-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-ink2">PNR <span class="text-ink">JX9KQ2</span></span>
+          <span class="text-xs text-terra font-medium group-hover:translate-x-0.5 transition">Details →</span>
+        </div>
+      </article>
+      <!-- hotel -->
+      <article class="group bg-white/70 border border-line rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_#1f1b1633] transition cursor-pointer" onclick="show('Detail · Hotel')">
+        <div class="flex items-center justify-between mb-4">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-hotel">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14M3 21h18M7 9h2m6 0h2M7 13h2m6 0h2M9 21v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4"/></svg>Hotel
+          </span>
+          <span class="text-[10px] font-medium text-train bg-train/10 px-2 py-0.5 rounded-full">Confirmed</span>
+        </div>
+        <h3 class="font-display text-xl font-600 leading-snug">Hôtel du Marais</h3>
+        <p class="text-sm text-ink2 mt-1">3 nights · Oct 12 – 15</p>
+        <p class="font-mono text-base font-medium mt-2">$720</p>
+        <div class="perf mt-4 pt-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-ink2">CONF <span class="text-ink">HM-44182</span></span>
+          <span class="text-xs text-terra font-medium group-hover:translate-x-0.5 transition">Details →</span>
+        </div>
+      </article>
+      <!-- train -->
+      <article class="group bg-white/70 border border-line rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_#1f1b1633] transition cursor-pointer" onclick="show('Detail · Train')">
+        <div class="flex items-center justify-between mb-4">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-train">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M4 11h16M8 20l-2 2m12-2 2 2M8.5 16h.01M15.5 16h.01"/></svg>Train
+          </span>
+          <span class="text-[10px] font-medium text-hotel bg-hotel/10 px-2 py-0.5 rounded-full">e-Ticket</span>
+        </div>
+        <h3 class="font-display text-xl font-600 leading-snug">Paris → Versailles</h3>
+        <p class="text-sm text-ink2 mt-1">RER C · Oct 14, 9:10 AM</p>
+        <p class="font-mono text-base font-medium mt-2">$9</p>
+        <div class="perf mt-4 pt-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-ink2">REF <span class="text-ink">SNCF-7781</span></span>
+          <span class="text-xs text-terra font-medium group-hover:translate-x-0.5 transition">Details →</span>
+        </div>
+      </article>
+      <!-- activity -->
+      <article class="group bg-white/70 border border-line rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_#1f1b1633] transition cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-activity">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 9l10 6 10-6-10-6zM2 9v6l10 6 10-6V9"/></svg>Activity
+          </span>
+          <span class="text-[10px] font-medium text-train bg-train/10 px-2 py-0.5 rounded-full">Timed entry</span>
+        </div>
+        <h3 class="font-display text-xl font-600 leading-snug">Musée du Louvre</h3>
+        <p class="text-sm text-ink2 mt-1">Oct 13, 10:00 AM</p>
+        <p class="font-mono text-base font-medium mt-2">$22</p>
+        <div class="perf mt-4 pt-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-ink2">TKT <span class="text-ink">LV-220913</span></span>
+          <span class="text-xs text-terra font-medium group-hover:translate-x-0.5 transition">Details →</span>
+        </div>
+      </article>
+      <!-- restaurant -->
+      <article class="group bg-white/70 border border-line rounded-2xl p-5 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_#1f1b1633] transition cursor-pointer">
+        <div class="flex items-center justify-between mb-4">
+          <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-food">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3v7a2 2 0 0 0 2 2h0v9M6 3v6m-2-6v6m14-6c-1.5 0-3 1.5-3 4s1.5 4 3 5v6"/></svg>Restaurant
+          </span>
+          <span class="text-[10px] font-medium text-train bg-train/10 px-2 py-0.5 rounded-full">Reserved</span>
+        </div>
+        <h3 class="font-display text-xl font-600 leading-snug">Le Comptoir</h3>
+        <p class="text-sm text-ink2 mt-1">Dinner · Oct 13, 8:30 PM · party of 4</p>
+        <p class="font-mono text-base font-medium mt-2">~$180</p>
+        <div class="perf mt-4 pt-3 flex items-center justify-between">
+          <span class="font-mono text-xs text-ink2">RES <span class="text-ink">LC-0930</span></span>
+          <span class="text-xs text-terra font-medium group-hover:translate-x-0.5 transition">Details →</span>
+        </div>
+      </article>
+      <!-- add -->
+      <button class="border-2 border-dashed border-line rounded-2xl p-5 flex flex-col items-center justify-center text-ink2 hover:border-terra hover:text-terra transition min-h-[180px]">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="text-sm font-medium mt-2">Add booking</span>
+      </button>
+    </div>
+
+    <div id="landing-agenda" class="hidden">
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+        <div class="flex gap-1 text-sm font-medium border border-line rounded-lg overflow-hidden">
+          <button class="px-3 py-1.5 bg-ink text-paper">Day</button>
+          <button class="px-3 py-1.5 text-ink2 hover:text-ink">Week</button>
+          <button class="px-3 py-1.5 text-ink2 hover:text-ink">All</button>
+        </div>
+        <div class="flex gap-1 overflow-x-auto">
+          <button class="px-3 py-1.5 rounded-lg bg-terra/10 text-terra text-sm font-semibold whitespace-nowrap">Mon 13</button>
+          <button class="px-3 py-1.5 rounded-lg text-ink2 hover:bg-paper2 text-sm whitespace-nowrap">Tue 14</button>
+          <button class="px-3 py-1.5 rounded-lg text-ink2 hover:bg-paper2 text-sm whitespace-nowrap">Wed 15</button>
+        </div>
+      </div>
+      <h2 class="font-display text-2xl font-600 mb-4">Monday, October 13</h2>
+      <div class="relative pl-20">
+        <div class="absolute left-16 top-2 bottom-2 w-px bg-line"></div>
+        <div class="relative mb-4">
+          <div class="absolute -left-20 top-1 w-14 text-right font-mono text-xs text-ink2">10:00</div>
+          <div class="absolute -left-[18px] top-1.5 w-3 h-3 rounded-full bg-activity ring-4 ring-paper"></div>
+          <div class="bg-white/70 border border-line rounded-xl p-4 flex items-center justify-between hover:shadow-sm transition cursor-pointer">
+            <div><span class="text-[11px] font-semibold uppercase tracking-wider text-activity">Activity</span><h3 class="font-display text-lg font-600">Musée du Louvre</h3></div>
+            <span class="text-xs text-terra">→</span>
+          </div>
+        </div>
+        <div class="relative mb-4">
+          <div class="absolute -left-20 top-1 w-14 text-right font-mono text-xs text-ink2">20:30</div>
+          <div class="absolute -left-[18px] top-1.5 w-3 h-3 rounded-full bg-food ring-4 ring-paper"></div>
+          <div class="bg-white/70 border border-line rounded-xl p-4 flex items-center justify-between hover:shadow-sm transition cursor-pointer">
+            <div><span class="text-[11px] font-semibold uppercase tracking-wider text-food">Restaurant</span><h3 class="font-display text-lg font-600">Le Comptoir</h3></div>
+            <span class="text-xs text-terra">→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ BUDGET ════ -->
+  <section data-screen="Budget" class="screen">
+    <button onclick="show('Landing · Loaded')" class="text-sm text-ink2 hover:text-ink flex items-center gap-1 mb-6">← Back to Paris</button>
+    <header class="mb-6">
+      <div class="font-mono text-[11px] tracking-[0.3em] uppercase text-terra mb-1">Wayfare · Budget</div>
+      <h1 class="font-display text-4xl font-600">Paris — spend</h1>
+    </header>
+
+    <!-- summary tiles -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-line border border-line rounded-xl overflow-hidden mb-6">
+      <div class="bg-white/70 p-4"><div class="text-xs text-ink2">Planned</div><div class="font-mono text-2xl font-medium mt-1">$1,773</div></div>
+      <div class="bg-white/70 p-4"><div class="text-xs text-ink2">Spent</div><div class="font-mono text-2xl font-medium mt-1 text-food">$1,304</div></div>
+      <div class="bg-white/70 p-4"><div class="text-xs text-ink2">Remaining</div><div class="font-mono text-2xl font-medium mt-1 text-train">$469</div></div>
+      <div class="bg-white/70 p-4"><div class="text-xs text-ink2">Items</div><div class="font-mono text-2xl font-medium mt-1">7</div></div>
+    </div>
+
+    <!-- by category bars -->
+    <div class="bg-white/70 border border-line rounded-xl p-5 mb-6">
+      <h3 class="font-semibold text-sm mb-4">By category</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex items-center gap-3"><span class="w-20 text-ink2">Flights</span><div class="flex-1 h-2 bg-paper2 rounded-full overflow-hidden"><div class="h-full bg-flight" style="width:64%"></div></div><span class="font-mono w-16 text-right">$842</span></div>
+        <div class="flex items-center gap-3"><span class="w-20 text-ink2">Hotel</span><div class="flex-1 h-2 bg-paper2 rounded-full overflow-hidden"><div class="h-full bg-hotel" style="width:55%"></div></div><span class="font-mono w-16 text-right">$720</span></div>
+        <div class="flex items-center gap-3"><span class="w-20 text-ink2">Food</span><div class="flex-1 h-2 bg-paper2 rounded-full overflow-hidden"><div class="h-full bg-food" style="width:18%"></div></div><span class="font-mono w-16 text-right">$242</span></div>
+        <div class="flex items-center gap-3"><span class="w-20 text-ink2">Activity</span><div class="flex-1 h-2 bg-paper2 rounded-full overflow-hidden"><div class="h-full bg-activity" style="width:5%"></div></div><span class="font-mono w-16 text-right">$22</span></div>
+        <div class="flex items-center gap-3"><span class="w-20 text-ink2">Transport</span><div class="flex-1 h-2 bg-paper2 rounded-full overflow-hidden"><div class="h-full bg-train" style="width:8%"></div></div><span class="font-mono w-16 text-right">$37</span></div>
+      </div>
+    </div>
+
+    <!-- ledger (TanStack Table lives here) -->
+    <div class="flex items-center justify-between mb-3 flex-wrap gap-3">
+      <div class="flex gap-1.5 text-xs font-medium flex-wrap">
+        <button class="px-2.5 py-1 rounded-full bg-ink text-paper">All</button>
+        <button class="px-2.5 py-1 rounded-full bg-paper2 text-ink2 hover:text-ink">Flights</button>
+        <button class="px-2.5 py-1 rounded-full bg-paper2 text-ink2 hover:text-ink">Hotel</button>
+        <button class="px-2.5 py-1 rounded-full bg-paper2 text-ink2 hover:text-ink">Food</button>
+        <button class="px-2.5 py-1 rounded-full bg-paper2 text-ink2 hover:text-ink">Activity</button>
+        <button class="px-2.5 py-1 rounded-full bg-paper2 text-ink2 hover:text-ink">Transport</button>
+      </div>
+      <button onclick="openExpense()" class="text-sm font-medium bg-terra hover:bg-terradeep text-paper px-3 py-1.5 rounded-lg transition">+ Add expense</button>
+    </div>
+
+    <div class="border border-line rounded-xl overflow-hidden bg-white/60">
+      <table class="w-full text-sm">
+        <thead class="bg-paper2 text-ink2 text-xs uppercase tracking-wide">
+          <tr>
+            <th class="text-left font-medium px-4 py-2.5 cursor-pointer">Date ↓</th>
+            <th class="text-left font-medium px-4 py-2.5">Description</th>
+            <th class="text-left font-medium px-4 py-2.5 hidden sm:table-cell">Category</th>
+            <th class="text-left font-medium px-4 py-2.5 hidden sm:table-cell">Status</th>
+            <th class="text-right font-medium px-4 py-2.5 cursor-pointer">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          <tr class="hover:bg-paper2/40">
+            <td class="px-4 py-3 font-mono text-xs text-ink2">Oct 12</td>
+            <td class="px-4 py-3 font-medium">MIA → CDG</td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-flight"></span>Flights</span></td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="text-[10px] text-ink2 bg-paper2 px-2 py-0.5 rounded-full">Planned</span></td>
+            <td class="px-4 py-3 text-right font-mono">$842.00</td>
+          </tr>
+          <tr class="hover:bg-paper2/40">
+            <td class="px-4 py-3 font-mono text-xs text-ink2">Oct 12</td>
+            <td class="px-4 py-3 font-medium">Hôtel du Marais</td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-hotel"></span>Hotel</span></td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="text-[10px] text-ink2 bg-paper2 px-2 py-0.5 rounded-full">Planned</span></td>
+            <td class="px-4 py-3 text-right font-mono">$720.00</td>
+          </tr>
+          <tr class="hover:bg-paper2/40">
+            <td class="px-4 py-3 font-mono text-xs text-ink2">Oct 13</td>
+            <td class="px-4 py-3 font-medium">Café Charlot — lunch</td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-food"></span>Food</span></td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="text-[10px] text-train bg-train/10 px-2 py-0.5 rounded-full">Actual</span></td>
+            <td class="px-4 py-3 text-right font-mono">$34.00</td>
+          </tr>
+          <tr class="hover:bg-paper2/40">
+            <td class="px-4 py-3 font-mono text-xs text-ink2">Oct 13</td>
+            <td class="px-4 py-3 font-medium">Louvre tickets</td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-activity"></span>Activity</span></td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="text-[10px] text-train bg-train/10 px-2 py-0.5 rounded-full">Actual</span></td>
+            <td class="px-4 py-3 text-right font-mono">$22.00</td>
+          </tr>
+          <tr class="hover:bg-paper2/40">
+            <td class="px-4 py-3 font-mono text-xs text-ink2">Oct 13</td>
+            <td class="px-4 py-3 font-medium">Taxi — Marais → Louvre</td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-train"></span>Transport</span></td>
+            <td class="px-4 py-3 hidden sm:table-cell"><span class="text-[10px] text-train bg-train/10 px-2 py-0.5 rounded-full">Actual</span></td>
+            <td class="px-4 py-3 text-right font-mono">$28.00</td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-paper2 font-medium">
+          <tr><td class="px-4 py-3" colspan="4">Total</td><td class="px-4 py-3 text-right font-mono">$1,646.00</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="text-xs text-ink2 mt-3 italic">Sortable / filterable / aggregating ledger = the TanStack Table home. Add-expense = Query mutation w/ optimistic update.</p>
+  </section>
+
+  <!-- ════ LANDING · LOADING ════ -->
+  <section data-screen="Landing · Loading" class="screen">
+    <header class="mb-8">
+      <div class="h-3 w-24 skel rounded mb-3"></div><div class="h-12 w-48 skel rounded-lg mb-3"></div><div class="h-3 w-56 skel rounded"></div>
+    </header>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="border border-line rounded-2xl p-5"><div class="flex justify-between mb-4"><div class="h-3 w-16 skel rounded"></div><div class="h-4 w-16 skel rounded-full"></div></div><div class="h-6 w-32 skel rounded mb-2"></div><div class="h-3 w-40 skel rounded mb-2"></div><div class="h-5 w-16 skel rounded"></div><div class="perf mt-4 pt-3 flex justify-between"><div class="h-3 w-20 skel rounded"></div><div class="h-3 w-12 skel rounded"></div></div></div>
+      <div class="border border-line rounded-2xl p-5"><div class="flex justify-between mb-4"><div class="h-3 w-16 skel rounded"></div><div class="h-4 w-16 skel rounded-full"></div></div><div class="h-6 w-28 skel rounded mb-2"></div><div class="h-3 w-36 skel rounded mb-2"></div><div class="h-5 w-16 skel rounded"></div><div class="perf mt-4 pt-3 flex justify-between"><div class="h-3 w-20 skel rounded"></div><div class="h-3 w-12 skel rounded"></div></div></div>
+      <div class="border border-line rounded-2xl p-5"><div class="flex justify-between mb-4"><div class="h-3 w-16 skel rounded"></div><div class="h-4 w-16 skel rounded-full"></div></div><div class="h-6 w-36 skel rounded mb-2"></div><div class="h-3 w-32 skel rounded mb-2"></div><div class="h-5 w-16 skel rounded"></div><div class="perf mt-4 pt-3 flex justify-between"><div class="h-3 w-20 skel rounded"></div><div class="h-3 w-12 skel rounded"></div></div></div>
+    </div>
+  </section>
+
+  <!-- ════ LANDING · EMPTY ════ -->
+  <section data-screen="Landing · Empty" class="screen">
+    <header class="mb-8"><div class="font-mono text-[11px] tracking-[0.3em] uppercase text-terra mb-1">Wayfare</div><h1 class="font-display text-5xl font-600 leading-none">New York</h1><p class="text-ink2 mt-2 text-sm">No items yet</p></header>
+    <div class="border-2 border-dashed border-line rounded-2xl py-20 flex flex-col items-center text-center">
+      <div class="w-14 h-14 rounded-full bg-paper2 grid place-items-center mb-4 text-terra"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 2 9l10 6 10-6-10-6zM2 9v6l10 6 10-6V9"/></svg></div>
+      <h2 class="font-display text-2xl font-600">Nothing booked yet</h2>
+      <p class="text-ink2 text-sm mt-1 max-w-xs">Add your first flight, hotel, or reservation to start building this trip.</p>
+      <button class="mt-5 bg-terra hover:bg-terradeep text-paper font-medium text-sm px-5 py-2.5 rounded-lg transition">+ Add booking</button>
+    </div>
+  </section>
+
+  <!-- ════ AGENDA (all view) ════ -->
+  <section data-screen="Agenda" class="screen">
+    <header class="mb-6"><div class="font-mono text-[11px] tracking-[0.3em] uppercase text-terra mb-1">Wayfare · Agenda</div><h1 class="font-display text-4xl font-600">Paris — all items</h1></header>
+    <div class="flex gap-1 text-sm font-medium border border-line rounded-lg overflow-hidden w-max mb-6"><button class="px-3 py-1.5 text-ink2 hover:text-ink">Day</button><button class="px-3 py-1.5 text-ink2 hover:text-ink">Week</button><button class="px-3 py-1.5 bg-ink text-paper">All</button></div>
+    <div class="space-y-8">
+      <div>
+        <h2 class="font-display text-xl font-600 mb-3 flex items-baseline gap-2">Sun, Oct 12 <span class="text-xs font-sans text-ink2">· 2 items</span></h2>
+        <div class="border border-line rounded-xl divide-y divide-line bg-white/60">
+          <div class="p-4 flex items-center gap-4 hover:bg-paper2/40 transition cursor-pointer"><span class="font-mono text-xs text-ink2 w-14">18:40</span><span class="w-2 h-2 rounded-full bg-flight"></span><span class="text-[11px] font-semibold uppercase tracking-wider text-flight w-20">Flight</span><span class="font-display text-lg font-600 flex-1">MIA → CDG</span><span class="font-mono text-sm hidden sm:inline">$842</span><span class="text-xs text-terra ml-3">→</span></div>
+          <div class="p-4 flex items-center gap-4 hover:bg-paper2/40 transition cursor-pointer"><span class="font-mono text-xs text-ink2 w-14">—</span><span class="w-2 h-2 rounded-full bg-hotel"></span><span class="text-[11px] font-semibold uppercase tracking-wider text-hotel w-20">Hotel</span><span class="font-display text-lg font-600 flex-1">Hôtel du Marais — check-in</span><span class="font-mono text-sm hidden sm:inline">$720</span><span class="text-xs text-terra ml-3">→</span></div>
+        </div>
+      </div>
+      <div>
+        <h2 class="font-display text-xl font-600 mb-3 flex items-baseline gap-2">Mon, Oct 13 <span class="text-xs font-sans text-ink2">· 2 items</span></h2>
+        <div class="border border-line rounded-xl divide-y divide-line bg-white/60">
+          <div class="p-4 flex items-center gap-4 hover:bg-paper2/40 transition cursor-pointer"><span class="font-mono text-xs text-ink2 w-14">10:00</span><span class="w-2 h-2 rounded-full bg-activity"></span><span class="text-[11px] font-semibold uppercase tracking-wider text-activity w-20">Activity</span><span class="font-display text-lg font-600 flex-1">Musée du Louvre</span><span class="font-mono text-sm hidden sm:inline">$22</span><span class="text-xs text-terra ml-3">→</span></div>
+          <div class="p-4 flex items-center gap-4 hover:bg-paper2/40 transition cursor-pointer"><span class="font-mono text-xs text-ink2 w-14">20:30</span><span class="w-2 h-2 rounded-full bg-food"></span><span class="text-[11px] font-semibold uppercase tracking-wider text-food w-20">Food</span><span class="font-display text-lg font-600 flex-1">Le Comptoir</span><span class="font-mono text-sm hidden sm:inline">~$180</span><span class="text-xs text-terra ml-3">→</span></div>
+        </div>
+      </div>
+      <div>
+        <h2 class="font-display text-xl font-600 mb-3 flex items-baseline gap-2">Tue, Oct 14 <span class="text-xs font-sans text-ink2">· empty</span></h2>
+        <div class="border border-dashed border-line rounded-xl p-6 text-center text-ink2 text-sm bg-paper2/30">Nothing scheduled — a free day.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ DETAIL · HOTEL ════ -->
+  <section data-screen="Detail · Hotel" class="screen">
+    <button onclick="show('Landing · Loaded')" class="text-sm text-ink2 hover:text-ink flex items-center gap-1 mb-6">← Back to Paris</button>
+    <div class="grid lg:grid-cols-2 gap-8">
+      <div>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-hotel mb-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14M3 21h18M7 9h2m6 0h2"/></svg> Hotel</span>
+        <h1 class="font-display text-4xl font-600 leading-tight">Hôtel du Marais</h1>
+        <p class="text-ink2 mt-1">12 Rue de Turenne, 75004 Paris</p>
+        <dl class="mt-6 grid grid-cols-2 gap-px bg-line border border-line rounded-xl overflow-hidden text-sm">
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Check-in</dt><dd class="font-medium mt-0.5">Oct 12, 3:00 PM</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Check-out</dt><dd class="font-medium mt-0.5">Oct 15, 11:00 AM</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Cost</dt><dd class="font-mono font-medium mt-0.5">$720.00</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Confirmation</dt><dd class="font-mono font-medium mt-0.5">HM-44182</dd></div>
+        </dl>
+        <div class="mt-6 bg-white/70 border border-line rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-sm">Weather · your dates</h3><span class="text-[10px] text-ink2 font-mono uppercase tracking-wide">Open-Meteo</span></div>
+          <div class="flex gap-4 overflow-x-auto">
+            <div class="text-center min-w-[52px]"><div class="text-xs text-ink2">Oct 12</div><div class="text-2xl my-1">☁️</div><div class="text-xs font-medium">16°/9°</div></div>
+            <div class="text-center min-w-[52px]"><div class="text-xs text-ink2">Oct 13</div><div class="text-2xl my-1">🌤️</div><div class="text-xs font-medium">18°/10°</div></div>
+            <div class="text-center min-w-[52px]"><div class="text-xs text-ink2">Oct 14</div><div class="text-2xl my-1">🌧️</div><div class="text-xs font-medium">14°/8°</div></div>
+          </div>
+        </div>
+        <!-- photos -->
+        <div class="mt-6">
+          <h3 class="font-semibold text-sm mb-3">Photos</h3>
+          <div class="grid grid-cols-4 gap-2">
+            <div class="aspect-square rounded-lg bg-paper2 border border-line"></div>
+            <div class="aspect-square rounded-lg bg-paper2 border border-line"></div>
+            <button class="aspect-square rounded-lg border-2 border-dashed border-line grid place-items-center text-ink2 hover:border-terra hover:text-terra transition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mockmap rounded-2xl h-56 border border-line">
+          <div class="pin" style="left:50%;top:55%"><div class="bg-hotel text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">Hotel</div><div class="w-2 h-2 bg-hotel rotate-45 mx-auto -mt-0.5"></div></div>
+          <div class="pin" style="left:30%;top:35%"><div class="w-3 h-3 bg-food rounded-full ring-2 ring-white"></div></div>
+          <div class="pin" style="left:68%;top:40%"><div class="w-3 h-3 bg-activity rounded-full ring-2 ring-white"></div></div>
+          <div class="pin" style="left:62%;top:70%"><div class="w-3 h-3 bg-food rounded-full ring-2 ring-white"></div></div>
+        </div>
+        <h3 class="font-semibold text-sm mt-5 mb-3 flex items-center justify-between">Nearby <span class="text-[10px] text-ink2 font-mono uppercase tracking-wide">Overpass / OSM</span></h3>
+        <ul class="space-y-2">
+          <li class="flex items-center gap-3 bg-white/70 border border-line rounded-lg p-3"><span class="w-2 h-2 rounded-full bg-food"></span><span class="flex-1 text-sm font-medium">Café Charlot</span><span class="text-[10px] text-food bg-food/10 px-2 py-0.5 rounded-full uppercase tracking-wide">Food</span><span class="font-mono text-xs text-ink2">120 m</span></li>
+          <li class="flex items-center gap-3 bg-white/70 border border-line rounded-lg p-3"><span class="w-2 h-2 rounded-full bg-activity"></span><span class="flex-1 text-sm font-medium">Musée Picasso</span><span class="text-[10px] text-activity bg-activity/10 px-2 py-0.5 rounded-full uppercase tracking-wide">Museum</span><span class="font-mono text-xs text-ink2">300 m</span></li>
+          <li class="flex items-center gap-3 bg-white/70 border border-line rounded-lg p-3"><span class="w-2 h-2 rounded-full bg-food"></span><span class="flex-1 text-sm font-medium">Marché des Enfants Rouges</span><span class="text-[10px] text-food bg-food/10 px-2 py-0.5 rounded-full uppercase tracking-wide">Food</span><span class="font-mono text-xs text-ink2">450 m</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ DETAIL · TRAIN (with ticket + QR) ════ -->
+  <section data-screen="Detail · Train" class="screen">
+    <button onclick="show('Landing · Loaded')" class="text-sm text-ink2 hover:text-ink flex items-center gap-1 mb-6">← Back to Paris</button>
+    <div class="grid lg:grid-cols-2 gap-8">
+      <div>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-train mb-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="12" rx="2"/><path d="M4 11h16"/></svg> Train</span>
+        <h1 class="font-display text-4xl font-600 leading-tight">Paris → Versailles</h1>
+        <p class="text-ink2 mt-1">RER C · Line C5</p>
+        <dl class="mt-6 grid grid-cols-2 gap-px bg-line border border-line rounded-xl overflow-hidden text-sm">
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Depart</dt><dd class="font-medium mt-0.5">Austerlitz · 9:10</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Arrive</dt><dd class="font-medium mt-0.5">Versailles · 9:52</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Cost</dt><dd class="font-mono font-medium mt-0.5">$9.00</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Ref</dt><dd class="font-mono font-medium mt-0.5">SNCF-7781</dd></div>
+        </dl>
+        <!-- ticket + QR -->
+        <div class="mt-6 bg-white/70 border border-line rounded-xl p-4 flex gap-4 items-center">
+          <div class="shrink-0 bg-white p-2 rounded-lg border border-line">
+            <svg width="76" height="76" viewBox="0 0 29 29" shape-rendering="crispEdges">
+              <rect width="29" height="29" fill="#fff"/>
+              <path fill="#1F1B16" d="M0 0h7v7H0zM2 2v3h3V2zM22 0h7v7h-7zM24 2v3h3V2zM0 22h7v7H0zM2 24v3h3v-3z"/>
+              <path fill="#1F1B16" d="M9 0h1v1H9zM11 0h2v2h-2zM14 1h1v1h-1zM16 0h1v2h-1zM9 2h1v1H9zM12 3h1v1h-1zM15 3h2v1h-2zM9 5h2v1H9zM13 5h1v2h-1zM18 4h1v1h-1zM20 5h1v1h-1zM8 9h1v1H8zM10 9h1v2h-1zM12 9h1v1h-1zM14 9h2v1h-2zM17 9h1v1h-1zM19 9h1v1h-1zM22 9h2v1h-2zM25 9h1v1h-1zM27 9h1v2h-1zM9 11h1v1H9zM13 11h1v1h-1zM16 11h1v2h-1zM20 11h1v1h-1zM23 11h1v1h-1zM26 11h1v1h-1zM8 13h2v1H8zM11 13h1v2h-1zM14 13h1v1h-1zM18 13h1v1h-1zM21 13h2v1h-2zM24 13h1v2h-1zM9 15h1v1H9zM13 15h2v1h-2zM16 15h1v1h-1zM19 15h1v2h-1zM22 15h1v1h-1zM26 15h2v1h-2zM8 17h1v2H8zM12 17h1v1h-1zM15 17h2v1h-2zM18 17h1v1h-1zM21 17h1v2h-1zM25 17h1v1h-1zM10 19h2v1h-2zM14 19h1v1h-1zM17 19h2v1h-2zM23 19h1v1h-1zM26 19h1v2h-1zM9 21h1v1H9zM11 21h1v1h-1zM13 21h2v1h-2zM16 21h1v2h-1zM19 21h1v1h-1zM22 21h2v1h-2zM25 21h1v1h-1zM10 23h1v1h-1zM12 23h2v1h-2zM15 23h1v1h-1zM18 23h2v1h-2zM21 23h1v2h-1zM24 23h2v1h-2zM27 23h1v1h-1zM9 25h2v1H9zM13 25h1v1h-1zM16 25h1v1h-1zM19 25h2v1h-2zM23 25h1v2h-1zM26 25h1v1h-1zM11 27h1v1h-1zM14 27h2v1h-2zM18 27h1v1h-1zM20 27h1v1h-1zM25 27h2v1h-2z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-semibold text-sm">e-Ticket</h3>
+            <p class="text-xs text-ink2 mt-0.5">QR rendered from the stored ticket payload. Scan or open the PDF.</p>
+            <button class="mt-2 text-xs font-medium bg-ink text-paper px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Open ticket PDF</button>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="font-semibold text-sm mb-3">Photos</h3>
+          <div class="grid grid-cols-4 gap-2">
+            <div class="aspect-square rounded-lg bg-paper2 border border-line"></div>
+            <div class="aspect-square rounded-lg bg-paper2 border border-line"></div>
+            <button class="aspect-square rounded-lg border-2 border-dashed border-line grid place-items-center text-ink2 hover:border-terra hover:text-terra transition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mockmap rounded-2xl h-56 border border-line">
+          <div class="routeline" style="left:22%;top:38%;width:56%;transform:rotate(20deg)"></div>
+          <div class="pin" style="left:22%;top:35%"><div class="bg-train text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">Austerlitz</div><div class="w-2 h-2 bg-train rotate-45 mx-auto -mt-0.5"></div></div>
+          <div class="pin" style="left:78%;top:62%"><div class="bg-ink text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">Versailles</div><div class="w-2 h-2 bg-ink rotate-45 mx-auto -mt-0.5"></div></div>
+        </div>
+        <p class="text-xs text-ink2 mt-3 italic">Mock route line — real version plots station markers + connector via Leaflet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ DETAIL · FLIGHT (with ticket + QR) ════ -->
+  <section data-screen="Detail · Flight" class="screen">
+    <button onclick="show('Landing · Loaded')" class="text-sm text-ink2 hover:text-ink flex items-center gap-1 mb-6">← Back to Paris</button>
+    <div class="grid lg:grid-cols-2 gap-8">
+      <div>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-flight mb-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2 16 11l3.5-3.5a2 2 0 0 0-2.8-2.8L13 8.2 4.8 6.4a1 1 0 0 0-.9 1.7l5.3 3.7-1.2 3.2"/></svg> Flight</span>
+        <h1 class="font-display text-4xl font-600 leading-tight">MIA → CDG</h1>
+        <p class="text-ink2 mt-1">American Airlines · AA62</p>
+        <dl class="mt-6 grid grid-cols-2 gap-px bg-line border border-line rounded-xl overflow-hidden text-sm">
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Depart</dt><dd class="font-medium mt-0.5">MIA · Oct 12, 6:40 PM</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Arrive</dt><dd class="font-medium mt-0.5">CDG · Oct 13, 9:05 AM</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Cost</dt><dd class="font-mono font-medium mt-0.5">$842.00</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">PNR</dt><dd class="font-mono font-medium mt-0.5">JX9KQ2</dd></div>
+        </dl>
+        <div class="mt-6 bg-white/70 border border-line rounded-xl p-4 flex gap-4 items-center">
+          <div class="shrink-0 bg-white p-2 rounded-lg border border-line">
+            <svg width="76" height="76" viewBox="0 0 29 29" shape-rendering="crispEdges">
+              <rect width="29" height="29" fill="#fff"/>
+              <path fill="#1F1B16" d="M0 0h7v7H0zM2 2v3h3V2zM22 0h7v7h-7zM24 2v3h3V2zM0 22h7v7H0zM2 24v3h3v-3z"/>
+              <path fill="#1F1B16" d="M9 1h2v1H9zM12 0h1v2h-1zM14 0h1v1h-1zM16 1h1v1h-1zM18 0h1v1h-1zM10 3h1v1h-1zM13 3h2v1h-2zM16 3h1v2h-1zM19 4h1v1h-1zM9 5h1v1H9zM12 5h1v1h-1zM14 5h1v1h-1zM8 9h1v1H8zM11 9h2v1h-2zM14 9h1v2h-1zM16 9h1v1h-1zM18 9h2v1h-2zM21 9h1v1h-1zM23 9h2v1h-2zM26 9h1v1h-1zM9 11h2v1H9zM13 11h1v1h-1zM15 11h1v2h-1zM18 11h1v1h-1zM20 11h2v1h-2zM24 11h1v1h-1zM27 11h1v1h-1zM8 13h1v2H8zM10 13h2v1h-2zM13 13h1v1h-1zM16 13h2v1h-2zM19 13h1v1h-1zM22 13h1v2h-1zM25 13h2v1h-2zM9 15h1v1H9zM12 15h2v1h-2zM15 15h1v1h-1zM17 15h1v2h-1zM20 15h1v1h-1zM23 15h1v1h-1zM26 15h1v2h-1zM8 17h2v1H8zM11 17h1v2h-1zM14 17h2v1h-2zM18 17h1v1h-1zM21 17h2v1h-2zM24 17h1v1h-1zM10 19h1v1h-1zM13 19h2v1h-2zM16 19h1v2h-1zM19 19h2v1h-2zM23 19h1v1h-1zM25 19h2v1h-2zM9 21h1v1H9zM12 21h1v1h-1zM15 21h2v1h-2zM18 21h1v2h-1zM21 21h1v1h-1zM24 21h2v1h-2zM11 23h2v1h-2zM14 23h1v1h-1zM17 23h2v1h-2zM20 23h1v1h-1zM23 23h2v1h-2zM26 23h1v1h-1zM10 25h1v1h-1zM13 25h1v1h-1zM16 25h2v1h-2zM19 25h1v1h-1zM22 25h1v2h-1zM25 25h1v1h-1zM27 25h1v1h-1zM12 27h1v1h-1zM15 27h2v1h-2zM18 27h1v1h-1zM21 27h2v1h-2zM24 27h1v1h-1z"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-semibold text-sm">Boarding pass</h3>
+            <p class="text-xs text-ink2 mt-0.5">Stored airline pass. The gate scans the airline's own barcode — open the real pass below.</p>
+            <button class="mt-2 text-xs font-medium bg-ink text-paper px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Open boarding pass</button>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="font-semibold text-sm mb-3">Photos</h3>
+          <div class="grid grid-cols-4 gap-2">
+            <div class="aspect-square rounded-lg bg-paper2 border border-line"></div>
+            <div class="aspect-square rounded-lg bg-paper2 border border-line"></div>
+            <button class="aspect-square rounded-lg border-2 border-dashed border-line grid place-items-center text-ink2 hover:border-terra hover:text-terra transition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mockmap rounded-2xl h-56 border border-line">
+          <svg class="absolute inset-0 w-full h-full z-[1]" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M18,72 Q50,8 82,40" fill="none" stroke="#1F1B16" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.5"/></svg>
+          <div class="pin" style="left:18%;top:72%"><div class="bg-flight text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">MIA</div><div class="w-2 h-2 bg-flight rotate-45 mx-auto -mt-0.5"></div></div>
+          <div class="pin" style="left:82%;top:40%"><div class="bg-ink text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">CDG</div><div class="w-2 h-2 bg-ink rotate-45 mx-auto -mt-0.5"></div></div>
+        </div>
+        <p class="text-xs text-ink2 mt-3 italic">Origin → destination arc. No live track data needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ DETAIL · LOADING ════ -->
+  <section data-screen="Detail · Loading" class="screen">
+    <div class="h-3 w-24 skel rounded mb-6"></div>
+    <div class="grid lg:grid-cols-2 gap-8">
+      <div><div class="h-3 w-16 skel rounded mb-3"></div><div class="h-10 w-64 skel rounded-lg mb-2"></div><div class="h-3 w-48 skel rounded mb-6"></div><div class="grid grid-cols-2 gap-px border border-line rounded-xl overflow-hidden"><div class="bg-white/70 p-4 h-16 skel"></div><div class="bg-white/70 p-4 h-16 skel"></div><div class="bg-white/70 p-4 h-16 skel"></div><div class="bg-white/70 p-4 h-16 skel"></div></div></div>
+      <div><div class="h-56 skel rounded-2xl"></div><div class="h-3 w-32 skel rounded mt-5 mb-3"></div><div class="space-y-2"><div class="h-12 skel rounded-lg"></div><div class="h-12 skel rounded-lg"></div></div></div>
+    </div>
+    <p class="text-xs text-ink2 mt-4 italic">Enrichment queries pending (geocode → POIs → weather).</p>
+  </section>
+
+  <!-- ════ DETAIL · ERROR + PARTIAL ════ -->
+  <section data-screen="Detail · Error" class="screen">
+    <button onclick="show('Landing · Loaded')" class="text-sm text-ink2 hover:text-ink flex items-center gap-1 mb-6">← Back to Paris</button>
+    <div class="grid lg:grid-cols-2 gap-8">
+      <div>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-hotel mb-2">Hotel</span>
+        <h1 class="font-display text-4xl font-600 leading-tight">Hôtel du Marais</h1>
+        <p class="text-ink2 mt-1">12 Rue de Turenne, 75004 Paris</p>
+        <dl class="mt-6 grid grid-cols-2 gap-px bg-line border border-line rounded-xl overflow-hidden text-sm">
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Check-in</dt><dd class="font-medium mt-0.5">Oct 12, 3:00 PM</dd></div>
+          <div class="bg-white/70 p-4"><dt class="text-ink2 text-xs">Confirmation</dt><dd class="font-mono font-medium mt-0.5">HM-44182</dd></div>
+        </dl>
+        <div class="mt-6 bg-white/70 border border-line rounded-xl p-4"><h3 class="font-semibold text-sm mb-3">Weather · your dates <span class="text-[10px] text-train ml-1">✓ loaded</span></h3><div class="flex gap-4"><div class="text-center"><div class="text-xs text-ink2">Oct 13</div><div class="text-2xl my-1">🌤️</div><div class="text-xs">18°/10°</div></div></div></div>
+      </div>
+      <div>
+        <div class="rounded-2xl h-56 border border-dashed border-food/40 bg-food/5 grid place-items-center text-center px-6"><div><div class="text-food text-2xl mb-2">⚠</div><p class="font-medium text-sm">Couldn't load map & nearby places</p><p class="text-ink2 text-xs mt-1">Geocoding service didn't respond. Your booking details are safe above.</p><button class="mt-3 text-xs font-medium text-terra border border-terra/40 px-3 py-1.5 rounded-lg hover:bg-terra/10">Retry</button></div></div>
+        <p class="text-xs text-ink2 mt-3 italic">Partial failure: local booking data + weather render; only the geo-dependent panel errors.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ 404 ════ -->
+  <section data-screen="404" class="screen">
+    <div class="py-24 text-center"><div class="font-display text-7xl font-600 text-terra">404</div><h1 class="font-display text-2xl font-600 mt-2">This booking wandered off</h1><p class="text-ink2 text-sm mt-1">No item matches that link.</p><button onclick="show('Landing · Loaded')" class="mt-5 bg-ink text-paper text-sm font-medium px-5 py-2.5 rounded-lg">← Back to trips</button></div>
+  </section>
+
+<!-- ════ ADD EXPENSE MODAL (bottom-sheet mobile / dialog desktop) ════ -->
+<div id="expenseModal" class="fixed inset-0 z-[60] hidden">
+  <div class="absolute inset-0 bg-ink/40" onclick="closeExpense()"></div>
+  <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:grid sm:place-items-center sm:p-4">
+    <div class="bg-paper w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-line shadow-2xl max-h-[78vh] overflow-y-auto">
+      <div class="sm:hidden flex justify-center pt-2"><div class="w-10 h-1 rounded-full bg-line"></div></div>
+      <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-line">
+        <h3 class="font-display text-xl font-600">Add expense</h3>
+        <button onclick="closeExpense()" class="text-ink2 hover:text-ink w-8 h-8 grid place-items-center rounded-lg hover:bg-paper2">✕</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <!-- amount + currency -->
+        <div>
+          <label class="block text-xs text-ink2 mb-1">Amount</label>
+          <div class="flex gap-2">
+            <input id="expAmount" oninput="updateUsd()" type="number" inputmode="decimal" placeholder="0.00" class="flex-1 border border-line rounded-lg px-3 py-2.5 text-base bg-white/70 font-mono focus:outline-none focus:border-terra" />
+            <select id="expCurrency" onchange="updateUsd()" class="border border-line rounded-lg px-3 py-2.5 text-sm bg-white/70 focus:outline-none focus:border-terra">
+              <option>EUR</option><option>USD</option><option>GBP</option><option>JPY</option>
+            </select>
+          </div>
+          <p id="expUsd" class="text-xs text-terra font-mono mt-1.5 h-4"></p>
+        </div>
+        <!-- description -->
+        <div>
+          <label class="block text-xs text-ink2 mb-1">Description</label>
+          <input placeholder="Café Charlot — lunch" class="w-full border border-line rounded-lg px-3 py-2.5 text-sm bg-white/70 focus:outline-none focus:border-terra" />
+        </div>
+        <!-- category -->
+        <div>
+          <label class="block text-xs text-ink2 mb-1.5">Category</label>
+          <div class="flex flex-wrap gap-2 text-sm">
+            <button data-cat onclick="pickCat(this)" class="inline-flex items-center gap-1.5 border border-line rounded-full px-3 py-1.5 hover:bg-paper2"><span class="w-2 h-2 rounded-full bg-flight"></span>Flight</button>
+            <button data-cat onclick="pickCat(this)" class="inline-flex items-center gap-1.5 border border-line rounded-full px-3 py-1.5 hover:bg-paper2"><span class="w-2 h-2 rounded-full bg-hotel"></span>Hotel</button>
+            <button data-cat onclick="pickCat(this)" class="inline-flex items-center gap-1.5 border border-line rounded-full px-3 py-1.5 ring-2 ring-ink bg-paper2"><span class="w-2 h-2 rounded-full bg-food"></span>Food</button>
+            <button data-cat onclick="pickCat(this)" class="inline-flex items-center gap-1.5 border border-line rounded-full px-3 py-1.5 hover:bg-paper2"><span class="w-2 h-2 rounded-full bg-activity"></span>Activity</button>
+            <button data-cat onclick="pickCat(this)" class="inline-flex items-center gap-1.5 border border-line rounded-full px-3 py-1.5 hover:bg-paper2"><span class="w-2 h-2 rounded-full bg-train"></span>Transport</button>
+            <button data-cat onclick="pickCat(this)" class="inline-flex items-center gap-1.5 border border-line rounded-full px-3 py-1.5 hover:bg-paper2"><span class="w-2 h-2 rounded-full bg-ink2"></span>Other</button>
+          </div>
+        </div>
+        <!-- date + attach -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-ink2 mb-1">Date</label>
+            <input type="date" value="2026-10-13" class="w-full border border-line rounded-lg px-3 py-2.5 text-sm bg-white/70 focus:outline-none focus:border-terra" />
+          </div>
+          <div>
+            <label class="block text-xs text-ink2 mb-1">Attach to</label>
+            <select class="w-full border border-line rounded-lg px-3 py-2.5 text-sm bg-white/70 focus:outline-none focus:border-terra">
+              <option>— Standalone —</option><option>Hôtel du Marais</option><option>Musée du Louvre</option><option>Le Comptoir</option>
+            </select>
+          </div>
+        </div>
+        <!-- receipt -->
+        <div>
+          <label class="block text-xs text-ink2 mb-1.5">Receipt (optional)</label>
+          <button class="w-full border-2 border-dashed border-line rounded-lg py-3 flex items-center justify-center gap-2 text-ink2 text-sm hover:border-terra hover:text-terra transition">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add photo
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 px-5 py-4 border-t border-line bg-paper2/40 sticky bottom-0">
+        <button onclick="closeExpense()" class="text-sm font-medium text-ink2 hover:text-ink px-3 py-2.5">Cancel</button>
+        <button onclick="closeExpense()" class="ml-auto text-sm font-medium border border-line rounded-lg px-3 py-2.5 hover:bg-paper">Save & add another</button>
+        <button onclick="closeExpense()" class="text-sm font-medium bg-terra hover:bg-terradeep text-paper rounded-lg px-4 py-2.5 transition">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+  const screens = [...document.querySelectorAll('.screen')];
+  const sw = document.getElementById('switcher');
+  screens.forEach(s=>{
+    const name = s.dataset.screen;
+    const b = document.createElement('button');
+    b.textContent = name; b.className = 'px-2.5 py-1 rounded transition hover:bg-paper/20';
+    b.onclick = ()=>show(name); b.dataset.btn = name; sw.appendChild(b);
+  });
+  function show(name){
+    screens.forEach(s=>s.classList.toggle('active', s.dataset.screen===name));
+    [...sw.children].forEach(b=>b.classList.toggle('bg-terra', b.dataset.btn===name));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function setLandingView(v){
+    document.getElementById('landing-cards').classList.toggle('hidden', v!=='cards');
+    document.getElementById('landing-agenda').classList.toggle('hidden', v!=='agenda');
+    document.getElementById('vbtn-cards').className = v==='cards' ? 'px-3 py-1.5 bg-ink text-paper' : 'px-3 py-1.5 text-ink2 hover:text-ink';
+    document.getElementById('vbtn-agenda').className = v==='agenda' ? 'px-3 py-1.5 bg-ink text-paper' : 'px-3 py-1.5 text-ink2 hover:text-ink';
+  }
+  function openExpense(){ document.getElementById('expenseModal').classList.remove('hidden'); document.body.style.overflow='hidden'; updateUsd(); }
+  function closeExpense(){ document.getElementById('expenseModal').classList.add('hidden'); document.body.style.overflow=''; }
+  function updateUsd(){
+    const amt = parseFloat(document.getElementById('expAmount').value)||0;
+    const cur = document.getElementById('expCurrency').value;
+    const rates = {USD:1, EUR:1.08, GBP:1.27, JPY:0.0064};
+    const usd = (amt*(rates[cur]||1)).toFixed(2);
+    document.getElementById('expUsd').textContent = (cur==='USD'||amt===0) ? '' : ('≈ $'+usd+' USD  ·  rate '+(rates[cur])+' (snapshot stored)');
+  }
+  function pickCat(btn){
+    document.querySelectorAll('[data-cat]').forEach(b=>b.classList.remove('ring-2','ring-ink','bg-paper2'));
+    btn.classList.add('ring-2','ring-ink','bg-paper2');
+  }
+  show('Login');
+</script>
+</body>
+</html>
